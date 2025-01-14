@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BINChecker</string>
+    <string name="home">Поиск по BIN</string>
+    <string name="history">История поиска</string>
 </resources>
