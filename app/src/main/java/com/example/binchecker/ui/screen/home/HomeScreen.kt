@@ -43,6 +43,7 @@ import com.example.binchecker.ui.theme.BINCheckerTheme
 
 @Composable
 fun HomeScreen(
+    navigateToHistoryScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BINCheckerTheme {
@@ -50,6 +51,7 @@ fun HomeScreen(
             modifier = modifier
         ) { innerPadding ->
             HomeBody(
+                navigateToHistoryScreen,
                 modifier = modifier.padding(innerPadding)
             )
         }
@@ -58,7 +60,10 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeBody(modifier: Modifier) {
+fun HomeBody(
+    navigateToHistoryScreen: () -> Unit,
+    modifier: Modifier
+) {
     val colors = OutlinedTextFieldDefaults. colors(
         unfocusedBorderColor = colorResource(R.color.purple_5),
         focusedBorderColor = colorResource(R.color.purple_5)
@@ -147,7 +152,7 @@ fun HomeBody(modifier: Modifier) {
                     containerColor = colorResource(R.color.purple_5)
                 ),
                 onClick = {
-
+                    navigateToHistoryScreen()
                 }
             ) {
                 Text(
@@ -284,6 +289,6 @@ fun BINSearchContentCardPreview() {
 @Composable
 fun HomeBodyPreview() {
     BINCheckerTheme {
-        HomeBody(Modifier.fillMaxSize())
+        HomeBody({}, Modifier.fillMaxSize())
     }
 }

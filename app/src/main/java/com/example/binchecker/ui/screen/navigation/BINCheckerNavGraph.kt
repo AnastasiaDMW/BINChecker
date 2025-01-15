@@ -16,7 +16,11 @@ fun BINCheckerNavHost(
         startDestination = HomeDestination.route
     ) {
         composable(route = HomeDestination.route) {
-            HomeScreen()
+            HomeScreen(
+                navigateToHistoryScreen = {
+                    navController.navigate(HistoryDestination.route)
+                }
+            )
         }
         composable(route = HistoryDestination.route) {
             HistoryScreen()
