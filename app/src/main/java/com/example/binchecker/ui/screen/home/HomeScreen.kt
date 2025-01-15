@@ -1,5 +1,6 @@
 package com.example.binchecker.ui.screen.home
 
+import android.widget.Toast
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults.Container
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,11 +33,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -65,7 +73,7 @@ fun HomeBody(modifier: Modifier) {
         unfocusedBorderColor = colorResource(R.color.purple_5),
         focusedBorderColor = colorResource(R.color.purple_5)
     )
-    var cardBIN by remember { mutableStateOf("") }
+    var cardBIN by remember { mutableStateOf(TextFieldValue("")) }
     val interactionSource = remember { MutableInteractionSource() }
 
     Column(
@@ -74,43 +82,44 @@ fun HomeBody(modifier: Modifier) {
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.home),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    painter = painterResource(R.drawable.ic_round_history),
-                    contentDescription = stringResource(R.string.history)
-                )
-            }
+            Text(
+                text = stringResource(R.string.home),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
 
-            Spacer(modifier = Modifier.height(48.dp))
-
+            Spacer(modifier = Modifier.height(64.dp))
             BasicTextField(
                 modifier = Modifier
                     .fillMaxWidth(),
                 value = cardBIN,
                 singleLine = true,
                 interactionSource = interactionSource,
-                onValueChange = { cardBIN = it },
+                onValueChange = {
+                    val input = it.text.replace(" ", "")
+
+                    if (input.isEmpty() || (input.length <= 8 && input.last().isDigit())) {
+                        val formattedText = StringBuilder()
+                        for (i in input.indices) {
+                            if (i > 0 && i % 4 == 0) {
+                                formattedText.append(" ")
+                            }
+                            formattedText.append(input[i])
+                        }
+                        cardBIN = TextFieldValue(formattedText.toString(), selection = TextRange(formattedText.length))
+                    }
+                },
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             ) { innerTextField ->
                 OutlinedTextFieldDefaults.DecorationBox(
-                    value = cardBIN,
+                    value = cardBIN.text,
                     innerTextField = innerTextField,
                     enabled = true,
                     singleLine = true,
+                    visualTransformation = BinVisualTransformation(),
                     interactionSource = interactionSource,
-                    visualTransformation = VisualTransformation.None,
                     placeholder = {
                         Text(text = stringResource(R.string.bin_input),
                             color = Color.Black)
@@ -131,9 +140,9 @@ fun HomeBody(modifier: Modifier) {
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            BINContentCard(modifier = Modifier, R.color.purple_1, TypeCardInfo.Card, mapOf())
-            BINContentCard(modifier = Modifier, R.color.purple_2, TypeCardInfo.Country, mapOf())
-            BINContentCard(modifier = Modifier, R.color.purple_1, TypeCardInfo.Bank, mapOf())
+            BINSearchContentCard(modifier = Modifier, R.color.purple_1, TypeCardInfo.Card, mapOf())
+            BINSearchContentCard(modifier = Modifier, R.color.purple_2, TypeCardInfo.Country, mapOf())
+            BINSearchContentCard(modifier = Modifier, R.color.purple_1, TypeCardInfo.Bank, mapOf())
 
             Spacer(modifier = Modifier.height(40.dp))
         }
@@ -161,8 +170,27 @@ fun HomeBody(modifier: Modifier) {
     }
 }
 
+fun formatBin(input: String): String {
+    return buildString {
+        for (i in input.indices) {
+            if (i > 0 && i % 4 == 0) append(' ') // Добавляем пробел после каждых 4 цифр
+            append(input[i])
+        }
+    }
+}
+
+class BinVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val formattedText = formatBin(text.text)
+        return TransformedText(
+            AnnotatedString(formattedText),
+            OffsetMapping.Identity
+        )
+    }
+}
+
 @Composable
-fun BINContentCard(
+fun BINSearchContentCard(
     modifier: Modifier,
     color: Int,
     typeCardInfo: TypeCardInfo,
@@ -273,10 +301,10 @@ fun BankInfoContent(data: Map<String, String>) {
 
 @Preview(showBackground = true)
 @Composable
-fun BINContentCardPreview() {
+fun BINSearchContentCardPreview() {
     BINCheckerTheme {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-            BINContentCard(Modifier.fillMaxWidth(), R.color.purple_1, TypeCardInfo.Bank, mapOf())
+            BINSearchContentCard(Modifier.fillMaxWidth(), R.color.purple_1, TypeCardInfo.Bank, mapOf())
         }
     }
 }
