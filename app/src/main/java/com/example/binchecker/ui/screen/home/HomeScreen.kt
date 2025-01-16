@@ -95,14 +95,8 @@ fun HomeBody(
                     val input = it.text.replace(" ", "")
 
                     if (input.isEmpty() || (input.length <= 8 && input.last().isDigit())) {
-                        val formattedText = StringBuilder()
-                        for (i in input.indices) {
-                            if (i > 0 && i % 4 == 0) {
-                                formattedText.append(" ")
-                            }
-                            formattedText.append(input[i])
-                        }
-                        cardBIN = TextFieldValue(formattedText.toString(), selection = TextRange(formattedText.length))
+                        val result = formattedBINText(input)
+                        cardBIN = TextFieldValue(result.toString(), selection = TextRange(result.length))
                     }
                 },
                 maxLines = 1,
@@ -138,8 +132,6 @@ fun HomeBody(
             BINSearchContentCard(modifier = Modifier, R.color.purple_1, TypeCardInfo.Card, mapOf())
             BINSearchContentCard(modifier = Modifier, R.color.purple_2, TypeCardInfo.Country, mapOf())
             BINSearchContentCard(modifier = Modifier, R.color.purple_1, TypeCardInfo.Bank, mapOf())
-
-            Spacer(modifier = Modifier.height(40.dp))
         }
 
         Column {
@@ -165,6 +157,17 @@ fun HomeBody(
     }
 }
 
+private fun formattedBINText(input: String): StringBuilder {
+    val formattedText = StringBuilder()
+    for (i in input.indices) {
+        if (i > 0 && i % 4 == 0) {
+            formattedText.append(" ")
+        }
+        formattedText.append(input[i])
+    }
+    return formattedText
+}
+
 @Composable
 fun BINSearchContentCard(
     modifier: Modifier,
@@ -185,6 +188,7 @@ fun BINSearchContentCard(
             modifier = modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.Center
         ) {
+            //сделать метод, который из мапы создает объект
             when(typeCardInfo) {
                 is TypeCardInfo.Card -> {
                     CardInfoContent(data)
