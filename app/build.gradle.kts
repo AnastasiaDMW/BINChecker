@@ -57,15 +57,13 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
-    //Lifecycle
-    implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.common.java8)
+//    //Lifecycle
+//    implementation(libs.androidx.lifecycle.livedata.ktx)
+//    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+//    implementation(libs.androidx.lifecycle.common.java8)
     //Retrofit
     implementation(libs.com.squareup.retrofit2)
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.com.squareup.converter.gson)
     //Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
