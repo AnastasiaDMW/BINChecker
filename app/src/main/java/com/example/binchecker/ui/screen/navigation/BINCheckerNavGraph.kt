@@ -6,9 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.binchecker.ui.screen.history.HistoryScreen
 import com.example.binchecker.ui.screen.home.HomeScreen
+import com.example.binchecker.ui.screen.home.HomeViewModel
 
 @Composable
 fun BINCheckerNavHost(
+    homeViewModel: HomeViewModel,
     navController: NavHostController
 ) {
     NavHost(
@@ -17,6 +19,7 @@ fun BINCheckerNavHost(
     ) {
         composable(route = HomeDestination.route) {
             HomeScreen(
+                homeViewModel = homeViewModel,
                 navigateToHistoryScreen = {
                     navController.navigate(HistoryDestination.route)
                 }

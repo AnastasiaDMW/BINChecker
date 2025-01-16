@@ -13,4 +13,7 @@
     <string name="url">URL: </string>
     <string name="phone">Телефон: </string>
     <string name="city">Город: </string>
+    <string name="flag_img">Изображение флага: </string>
+    <string name="word_code">Буквенный код: </string>
+    <string name="country_code">Код страны: </string>
 </resources>

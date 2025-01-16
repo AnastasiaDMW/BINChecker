@@ -39,10 +39,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.binchecker.R
+import com.example.binchecker.repository.BINNetworkRepository
 import com.example.binchecker.ui.theme.BINCheckerTheme
 
 @Composable
 fun HomeScreen(
+    homeViewModel: HomeViewModel,
     navigateToHistoryScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -51,6 +53,7 @@ fun HomeScreen(
             modifier = modifier
         ) { innerPadding ->
             HomeBody(
+                homeViewModel,
                 navigateToHistoryScreen,
                 modifier = modifier.padding(innerPadding)
             )
@@ -61,6 +64,7 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeBody(
+    homeViewModel: HomeViewModel,
     navigateToHistoryScreen: () -> Unit,
     modifier: Modifier
 ) {
@@ -245,6 +249,27 @@ fun CountryInfoContent(data: Map<String, String>) {
         )
         Text(text = "Denmark")
     }
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.flag_img),
+            fontWeight = FontWeight.Bold
+        )
+        Text(text = "\uD83C\uDDE9\uD83C\uDDF0")
+    }
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.word_code),
+            fontWeight = FontWeight.Bold
+        )
+        Text(text = "DK")
+    }
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.country_code),
+            fontWeight = FontWeight.Bold
+        )
+        Text(text = "208")
+    }
 }
 
 @Composable
@@ -286,13 +311,5 @@ fun BINSearchContentCardPreview() {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
             BINSearchContentCard(Modifier.fillMaxWidth(), R.color.purple_1, TypeCardInfo.Bank, mapOf())
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeBodyPreview() {
-    BINCheckerTheme {
-        HomeBody({}, Modifier.fillMaxSize())
     }
 }
