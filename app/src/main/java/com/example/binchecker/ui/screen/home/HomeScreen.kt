@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -515,6 +514,17 @@ fun ErrorCard(message: String) {
     }
 }
 
+private fun formattedBINText(input: String): StringBuilder {
+    val formattedText = StringBuilder()
+    for (i in input.indices) {
+        if (i > 0 && i % 4 == 0) {
+            formattedText.append(" ")
+        }
+        formattedText.append(input[i])
+    }
+    return formattedText
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ErrorCardPreview() {
@@ -529,15 +539,4 @@ fun LoadingScreenPreview() {
     BINCheckerTheme {
         LoadingScreen()
     }
-}
-
-private fun formattedBINText(input: String): StringBuilder {
-    val formattedText = StringBuilder()
-    for (i in input.indices) {
-        if (i > 0 && i % 4 == 0) {
-            formattedText.append(" ")
-        }
-        formattedText.append(input[i])
-    }
-    return formattedText
 }

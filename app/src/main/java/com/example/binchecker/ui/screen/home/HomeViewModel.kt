@@ -1,6 +1,5 @@
 package com.example.binchecker.ui.screen.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.binchecker.data.database.entity.CardInfo
@@ -63,7 +62,6 @@ class HomeViewModel @Inject constructor(
                 binNetRepository.getCardBIN(numberCard)
                     .flowOn(Dispatchers.IO)
                     .catch { e ->
-                        Log.d("ERROR_API", e.message.toString())
                         isRequestDataFromApiError = true
                         _homeUiState.value = HomeUIState.Error("Попробуйте позже")
                         isSendRequest = false
@@ -71,11 +69,8 @@ class HomeViewModel @Inject constructor(
                     }
                     .collect {
                         val bin = numberCard.replace(" ", "").toInt()
-                        Log.d("RESPONSE_API", it.toCardInfo(bin).toString())
                         _homeUiState.value = HomeUIState.SuccessCard(it.toCardInfo(bin))
-                        Log.d("ADD_DATA_SEARCH", "Дошло до добавления")
                         addCard(it.toCardInfo(bin))
-                        Log.d("ADD_DATA_SEARCH", "Добавило")
                         isSendRequest = false
                     }
 
@@ -92,12 +87,10 @@ class HomeViewModel @Inject constructor(
                 binDBRepository.getAllCards()
                     .flowOn(Dispatchers.IO)
                     .catch { e ->
-                        Log.d("DB_ERROR", e.message.toString())
                         getAllCards()
                     }
                     .collect {
                         _cards.value = it
-                        Log.d("ALL_CARDS", "Cards: ${cards.value}")
                     }
             } catch (e: IOException) {
                 _homeUiState.value = HomeUIState.Error("Ошибка получения карт")
@@ -111,7 +104,6 @@ class HomeViewModel @Inject constructor(
                 binDBRepository.insertCard(card)
                     .flowOn(Dispatchers.IO)
                     .catch { e ->
-                        Log.d("DB_ERROR", e.message.toString())
                         _homeUiState.value = HomeUIState.Error("Ошибка добавления карты")
                     }
                     .collect {
@@ -132,24 +124,20 @@ class HomeViewModel @Inject constructor(
     private fun searchCard(numberCard: String) {
         if (!isSendRequest) {
             isSendRequest = true
-            Log.d("ALL_CARDS", "cards: $cards")
             if (_cards.value != emptyList<CardInfo>()) {
                 val card = numberCard.replace(" ", "")
                 var isExist = false
-                Log.d("DATA_SEARCH", "Ищет совпадения в БД")
                 for (curCard in _cards.value) {
                     val strCard = curCard.id.toString()
                     if (strCard.length <= card.length) {
                         if (numberEquals(card, strCard)) {
                             _homeUiState.value = HomeUIState.SuccessCard(curCard)
-                            Log.d("DATA_SEARCH", "Нашло совпадения")
                             isExist = true
                             break
                         }
                     } else {
                         if (numberEquals(strCard, card)) {
                             _homeUiState.value = HomeUIState.SuccessCard(curCard)
-                            Log.d("DATA_SEARCH", "Нашло совпадения")
                             isExist = true
                             break
                         }
@@ -157,7 +145,6 @@ class HomeViewModel @Inject constructor(
                 }
 
                 if (!isExist) {
-                    Log.d("DATA_SEARCH", "Не нашло совпадения")
                     getCardFromApi(numberCard)
                 } else {
                     isSendRequest = false
@@ -175,10 +162,6 @@ class HomeViewModel @Inject constructor(
                 countEquals++
             }
         }
-        if (countEquals == curCard.length) {
-            Log.d("DATA_SEARCH","Карта найдена: $curCard")
-            return true
-        }
-        return false
+        return countEquals == curCard.length
     }
 }
