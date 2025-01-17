@@ -1,5 +1,6 @@
 package com.example.binchecker
 
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,6 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             val homeViewModel: HomeViewModel by viewModels()
             val historyViewModel: HistoryViewModel by viewModels()
             BINCheckerTheme {
