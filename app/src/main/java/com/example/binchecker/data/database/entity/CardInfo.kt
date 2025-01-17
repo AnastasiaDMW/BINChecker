@@ -8,10 +8,10 @@ import androidx.room.PrimaryKey
 data class CardInfo(
     @PrimaryKey
     val id: Int,
-    val scheme: String,
-    val type: String,
-    val brand: String,
-    val prepaid: Boolean,
+    val scheme: String = "",
+    val type: String = "",
+    val brand: String = "",
+    val prepaid: Boolean = false,
     @Embedded
     val number: NumberCard,
     @Embedded

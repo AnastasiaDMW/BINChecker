@@ -5,12 +5,12 @@ import androidx.room.Entity
 
 @Entity(tableName = "country")
 data class CountryCard(
-    val numeric: String,
-    val alpha2: String,
+    val numeric: String = "",
+    val alpha2: String = "",
     @ColumnInfo("country_name")
-    val name: String,
-    val emoji: String,
-    val currency: String,
-    val latitude: Int,
-    val longitude: Int
+    val name: String = "",
+    val emoji: String = "",
+    val currency: String = "",
+    val latitude: Int = 0,
+    val longitude: Int = 0
 )

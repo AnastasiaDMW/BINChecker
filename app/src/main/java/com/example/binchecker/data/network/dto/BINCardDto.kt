@@ -18,27 +18,27 @@ data class BINCardDto(
 fun BINCardDto.toCardInfo(id: Int): CardInfo =
     CardInfo(
         id = id,
-        scheme = this.scheme,
-        type = this.type,
-        brand = this.brand,
-        prepaid = this.prepaid,
+        scheme = this.scheme ?: "",
+        type = this.type ?: "",
+        brand = this.brand ?: "",
+        prepaid = this.prepaid ?: false,
         number = NumberCard(
-            length = this.number.length,
-            luhn = this.number.luhn
+            length = this.number.length ?: 0,
+            luhn = this.number.luhn ?: false
         ),
         country = CountryCard(
-            numeric = this.country.numeric,
-            alpha2 = this.country.alpha2,
-            name = this.country.name,
-            emoji = this.country.emoji,
-            currency = this.country.currency,
-            latitude = this.country.latitude,
-            longitude = this.country.longitude
+            numeric = this.country.numeric ?: "",
+            alpha2 = this.country.alpha2 ?: "",
+            name = this.country.name ?: "",
+            emoji = this.country.emoji ?: "",
+            currency = this.country.currency ?: "",
+            latitude = this.country.latitude ?: 0,
+            longitude = this.country.longitude ?: 0
         ),
         bank = BankCard(
-            name = this.bank.name,
-            url = this.bank.url,
-            phone = this.bank.phone,
-            city = this.bank.city,
+            name = this.bank.name ?: "",
+            url = this.bank.url ?: "",
+            phone = this.bank.phone ?: "",
+            city = this.bank.city ?: "",
         )
     )

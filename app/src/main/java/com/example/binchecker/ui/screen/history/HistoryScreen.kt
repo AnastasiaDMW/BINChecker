@@ -103,12 +103,12 @@ fun BINContentCard(color: Int, data: Map<String, String>) {
                     fontWeight = FontWeight.Bold
                 )
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            CardInfoContent(data)
-            Spacer(modifier = Modifier.height(8.dp))
-            CountryInfoContent(data)
-            Spacer(modifier = Modifier.height(8.dp))
-            BankInfoContent(data)
+//            Spacer(modifier = Modifier.height(12.dp))
+//            CardInfoContent(data)
+//            Spacer(modifier = Modifier.height(8.dp))
+//            CountryInfoContent(data)
+//            Spacer(modifier = Modifier.height(8.dp))
+//            BankInfoContent(data)
         }
     }
 }

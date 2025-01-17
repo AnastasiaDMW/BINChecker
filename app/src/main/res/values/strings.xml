@@ -16,4 +16,5 @@
     <string name="flag_img">Изображение флага: </string>
     <string name="word_code">Буквенный код: </string>
     <string name="country_code">Код страны: </string>
+    <string name="error">Ошибка!</string>
 </resources>
