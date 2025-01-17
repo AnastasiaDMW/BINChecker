@@ -36,7 +36,6 @@ class HomeViewModel @Inject constructor(
     val homeUiState: StateFlow<HomeUIState> = _homeUiState
 
     private val _cards: MutableStateFlow<List<CardInfo>> = MutableStateFlow(emptyList())
-    private val cards: StateFlow<List<CardInfo>> = _cards
 
     private var currentJob: Job? = null
 
@@ -61,7 +60,7 @@ class HomeViewModel @Inject constructor(
                 _homeUiState.value = HomeUIState.Loading
                 binNetRepository.getCardBIN(numberCard)
                     .flowOn(Dispatchers.IO)
-                    .catch { e ->
+                    .catch {
                         isRequestDataFromApiError = true
                         _homeUiState.value = HomeUIState.Error("Попробуйте позже")
                         isSendRequest = false
@@ -86,7 +85,7 @@ class HomeViewModel @Inject constructor(
             try {
                 binDBRepository.getAllCards()
                     .flowOn(Dispatchers.IO)
-                    .catch { e ->
+                    .catch {
                         getAllCards()
                     }
                     .collect {
@@ -103,7 +102,7 @@ class HomeViewModel @Inject constructor(
             try {
                 binDBRepository.insertCard(card)
                     .flowOn(Dispatchers.IO)
-                    .catch { e ->
+                    .catch {
                         _homeUiState.value = HomeUIState.Error("Ошибка добавления карты")
                     }
                     .collect {
