@@ -1,6 +1,15 @@
 package com.example.binchecker.ui.screen.home
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -42,10 +51,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.binchecker.R
+import com.example.binchecker.data.Constant.REQUEST_CODE
 import com.example.binchecker.data.database.entity.CardInfo
 import com.example.binchecker.data.network.dto.BankDto
 import com.example.binchecker.data.network.dto.CardInfoDto
@@ -89,6 +102,18 @@ fun HomeBody(
     )
     var cardBIN by remember { mutableStateOf(TextFieldValue("")) }
     val interactionSource = remember { MutableInteractionSource() }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { }
+    )
+    val requestPermission = {
+        permissionLauncher.launch(android.Manifest.permission.WRITE_CONTACTS)
+    }
+
+    LaunchedEffect(Unit) {
+        requestPermission()
+    }
 
     LaunchedEffect(data) {
         cardBIN = TextFieldValue("")
@@ -172,9 +197,27 @@ fun HomeBody(
                     val card = (data as HomeUIState.SuccessCard).curCard
                     if (card != null) {
                         Spacer(modifier = Modifier.height(40.dp))
-                        BINSearchContentCard(modifier = Modifier, R.color.purple_1, TypeCardInfo.Card, card)
-                        BINSearchContentCard(modifier = Modifier, R.color.purple_2, TypeCardInfo.Country, card)
-                        BINSearchContentCard(modifier = Modifier, R.color.purple_1, TypeCardInfo.Bank, card)
+                        BINSearchContentCard(
+                            modifier = Modifier,
+                            R.color.purple_1,
+                            TypeCardInfo.Card,
+                            card,
+                            context
+                        )
+                        BINSearchContentCard(
+                            modifier = Modifier,
+                            R.color.purple_2,
+                            TypeCardInfo.Country,
+                            card,
+                            context
+                        )
+                        BINSearchContentCard(
+                            modifier = Modifier,
+                            R.color.purple_1,
+                            TypeCardInfo.Bank,
+                            card,
+                            context
+                        )
                     }
                 }
             }
@@ -208,7 +251,8 @@ fun BINSearchContentCard(
     modifier: Modifier,
     color: Int,
     typeCardInfo: TypeCardInfo,
-    cardInfo: CardInfo
+    cardInfo: CardInfo,
+    context: Context
 ) {
     Card(
         modifier = modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
@@ -228,10 +272,10 @@ fun BINSearchContentCard(
                     CardInfoContent(cardInfo.toCardInfoDto())
                 }
                 is TypeCardInfo.Country -> {
-                    CountryInfoContent(cardInfo.toCountryDto())
+                    CountryInfoContent(cardInfo.toCountryDto(), context)
                 }
                 is TypeCardInfo.Bank -> {
-                    BankInfoContent(cardInfo.toBankDto())
+                    BankInfoContent(cardInfo.toBankDto(), context)
                 }
             }
         }
@@ -278,7 +322,7 @@ fun CardInfoContent(data: CardInfoDto) {
 }
 
 @Composable
-fun CountryInfoContent(data: CountryDto) {
+fun CountryInfoContent(data: CountryDto, context: Context) {
     if (data.name != "") {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -315,10 +359,30 @@ fun CountryInfoContent(data: CountryDto) {
             Text(text = " ${data.numeric}")
         }
     }
+    if (data.latitude != 0 && data.longitude != 0) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(R.string.latitude_and_longitude),
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                modifier = Modifier
+                    .clickable {
+                        val geoUri = "geo:0,0?q=${data.latitude},${data.longitude}(Maninagar)"
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(geoUri))
+                        context.startActivity(intent)
+                    },
+                text = " ${data.latitude}, ${data.longitude}",
+                textDecoration = TextDecoration.Underline,
+                color = colorResource(R.color.link_text)
+            )
+        }
+    }
 }
 
 @Composable
-fun BankInfoContent(data: BankDto) {
+fun BankInfoContent(data: BankDto, context: Context) {
+
     if (data.name != "") {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -334,7 +398,25 @@ fun BankInfoContent(data: BankDto) {
                 text = stringResource(R.string.url),
                 fontWeight = FontWeight.Bold
             )
-            Text(text = " ${data.url}")
+            Text(
+                modifier = Modifier
+                    .clickable {
+                        val url = "https://${data.url}"
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        if (intent.resolveActivity(context.packageManager) != null) {
+                            context.startActivity(intent)
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Нет приложения для открытия ссылок. Проверьте установленные браузеры.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                text = " ${data.url}",
+                textDecoration = TextDecoration.Underline,
+                color = colorResource(R.color.link_text)
+            )
         }
     }
     if (data.phone != "") {
@@ -343,7 +425,28 @@ fun BankInfoContent(data: BankDto) {
                 text = stringResource(R.string.phone),
                 fontWeight = FontWeight.Bold
             )
-            Text(text = " ${data.phone}")
+            Text(
+                modifier = Modifier
+                    .clickable {
+                        if (ContextCompat.checkSelfPermission(
+                                context,
+                                android.Manifest.permission.READ_CONTACTS
+                            ) == PackageManager.PERMISSION_GRANTED
+                        ) {
+                            val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${data.phone}"))
+                            context.startActivity(intent)
+                        } else {
+                            ActivityCompat.requestPermissions(
+                                context as Activity,
+                                arrayOf(android.Manifest.permission.READ_CONTACTS),
+                                REQUEST_CODE
+                            )
+                        }
+                    },
+                text = " ${data.phone}",
+                textDecoration = TextDecoration.Underline,
+                color = colorResource(R.color.link_text)
+            )
         }
     }
     if (data.city != "") {

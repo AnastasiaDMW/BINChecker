@@ -1,5 +1,6 @@
 package com.example.binchecker.ui.screen.history
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -99,7 +100,7 @@ fun HistoryBody(
                     LazyColumn {
                         items(cards.indices.toList()) { index ->
                             val color = if (index % 2 == 0) R.color.purple_1 else R.color.purple_2
-                            BINContentCard(color, cards[index])
+                            BINContentCard(color, cards[index], context)
                         }
                     }
                 } else {
@@ -117,7 +118,7 @@ fun HistoryBody(
 }
 
 @Composable
-fun BINContentCard(color: Int, cardInfo: CardInfo) {
+fun BINContentCard(color: Int, cardInfo: CardInfo, context: Context) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
         elevation = CardDefaults.cardElevation(
@@ -144,9 +145,9 @@ fun BINContentCard(color: Int, cardInfo: CardInfo) {
             Spacer(modifier = Modifier.height(12.dp))
             CardInfoContent(cardInfo.toCardInfoDto())
             Spacer(modifier = Modifier.height(8.dp))
-            CountryInfoContent(cardInfo.toCountryDto())
+            CountryInfoContent(cardInfo.toCountryDto(), context)
             Spacer(modifier = Modifier.height(8.dp))
-            BankInfoContent(cardInfo.toBankDto())
+            BankInfoContent(cardInfo.toBankDto(), context)
         }
     }
 }

@@ -5,7 +5,7 @@
     <color name="purple_3">#FFC8B6FF</color>
     <color name="purple_4">#FFB8C0FF</color>
     <color name="purple_5">#FF9EBCFF</color>
-<!--    <color name="purple_5">#FF92B3FF</color>-->
+    <color name="link_text">#FF38BDFF</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
