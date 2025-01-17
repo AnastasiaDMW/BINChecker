@@ -81,7 +81,7 @@ fun HomeBody(
     modifier: Modifier
 ) {
     val context = LocalContext.current
-    val data by homeViewModel.uiState.collectAsState()
+    val data by homeViewModel.homeUiState.collectAsState()
     val colors = OutlinedTextFieldDefaults. colors(
         unfocusedBorderColor = colorResource(R.color.purple_5),
         focusedBorderColor = colorResource(R.color.purple_5)
@@ -151,7 +151,7 @@ fun HomeBody(
             }
 
             when (data) {
-                is UIState.Loading -> {
+                is HomeUIState.Loading -> {
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
                         verticalArrangement = Arrangement.Center,
@@ -160,12 +160,12 @@ fun HomeBody(
                         LoadingScreen()
                     }
                 }
-                is UIState.Error -> {
-                    val errorMessage = (data as UIState.Error).error
+                is HomeUIState.Error -> {
+                    val errorMessage = (data as HomeUIState.Error).error
                     Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
                 }
-                is UIState.SuccessCard -> {
-                    val card = (data as UIState.SuccessCard).curCard
+                is HomeUIState.SuccessCard -> {
+                    val card = (data as HomeUIState.SuccessCard).curCard
                     if (card != null) {
                         Spacer(modifier = Modifier.height(40.dp))
                         BINSearchContentCard(modifier = Modifier, R.color.purple_1, TypeCardInfo.Card, card)

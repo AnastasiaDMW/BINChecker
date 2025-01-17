@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import java.io.IOError
 import java.io.IOException
 import javax.inject.Inject
 
@@ -26,8 +25,8 @@ class HomeViewModel @Inject constructor(
 
     var isSendRequest = false
 
-    private val _uiState: MutableStateFlow<UIState> = MutableStateFlow(UIState.SuccessCard(null))
-    val uiState: StateFlow<UIState> = _uiState
+    private val _Home_uiState: MutableStateFlow<HomeUIState> = MutableStateFlow(HomeUIState.SuccessCard(null))
+    val homeUiState: StateFlow<HomeUIState> = _Home_uiState
 
     private val _cards: MutableStateFlow<List<CardInfo>> = MutableStateFlow(emptyList())
     val cards: StateFlow<List<CardInfo>> = _cards
@@ -39,20 +38,20 @@ class HomeViewModel @Inject constructor(
     private fun getCardFromApi(numberCard: String) {
         viewModelScope.launch {
             try {
-                _uiState.value = UIState.Loading
+                _Home_uiState.value = HomeUIState.Loading
                 binNetRepository.getCardBIN(numberCard)
                     .flowOn(Dispatchers.IO)
                     .catch { e ->
                         Log.d("ERROR_API", e.message.toString())
-                        _uiState.value = UIState.Error("Ошибка получения данных, проверьте интернет соединение")
+                        _Home_uiState.value = HomeUIState.Error("Ошибка получения данных, проверьте интернет соединение")
                     }
                     .collect {
                         val bin = numberCard.replace(" ", "").toInt()
                         Log.d("RESPONSE_API", it.toCardInfo(bin).toString())
-                        _uiState.value = UIState.SuccessCard(it.toCardInfo(bin))
+                        _Home_uiState.value = HomeUIState.SuccessCard(it.toCardInfo(bin))
                         if (it.brand == null) {
                             Log.d("DATA_SEARCH", "Данные пустые")
-                            _uiState.value = UIState.Error("Такой карты нет")
+                            _Home_uiState.value = HomeUIState.Error("Такой карты нет")
                         } else {
                             Log.d("ADD_DATA_SEARCH", "Дошло до добавления")
                             addCard(it.toCardInfo(bin))
@@ -60,7 +59,7 @@ class HomeViewModel @Inject constructor(
                         }
                     }
             } catch (e: IOException) {
-                _uiState.value = UIState.Error("Ошибка получения данных, проверьте интернет соединение")
+                _Home_uiState.value = HomeUIState.Error("Ошибка получения данных, проверьте интернет соединение")
             }
         }
     }
@@ -78,7 +77,7 @@ class HomeViewModel @Inject constructor(
                         _cards.value = it
                     }
             } catch (e: IOException) {
-                _uiState.value = UIState.Error("Ошибка получения карт")
+                _Home_uiState.value = HomeUIState.Error("Ошибка получения карт")
             }
         }
     }
@@ -90,14 +89,14 @@ class HomeViewModel @Inject constructor(
                     .flowOn(Dispatchers.IO)
                     .catch { e ->
                         Log.d("DB_ERROR", e.message.toString())
-                        _uiState.value = UIState.Error("Ошибка добавления карты")
+                        _Home_uiState.value = HomeUIState.Error("Ошибка добавления карты")
                     }
                     .collect {
-                        _uiState.value = UIState.SuccessCard(card)
+                        _Home_uiState.value = HomeUIState.SuccessCard(card)
                         getAllCards()
                     }
             } catch (e: IOException) {
-                _uiState.value = UIState.Error("Ошибка добавления карты")
+                _Home_uiState.value = HomeUIState.Error("Ошибка добавления карты")
             }
 
         }
@@ -113,14 +112,14 @@ class HomeViewModel @Inject constructor(
                 val strCard = curCard.id.toString()
                 if (strCard.length <= card.length) {
                     if (numberEquals(card, strCard)) {
-                        _uiState.value = UIState.SuccessCard(curCard)
+                        _Home_uiState.value = HomeUIState.SuccessCard(curCard)
                         Log.d("DATA_SEARCH", "Нашло совпадения")
                         isExist = true
                         break
                     }
                 } else {
                     if (numberEquals(strCard, card)) {
-                        _uiState.value = UIState.SuccessCard(curCard)
+                        _Home_uiState.value = HomeUIState.SuccessCard(curCard)
                         Log.d("DATA_SEARCH", "Нашло совпадения")
                         isExist = true
                         break
