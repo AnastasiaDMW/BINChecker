@@ -24,6 +24,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults.Container
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -89,6 +90,10 @@ fun HomeBody(
     var cardBIN by remember { mutableStateOf(TextFieldValue("")) }
     val interactionSource = remember { MutableInteractionSource() }
 
+    LaunchedEffect(data) {
+        cardBIN = TextFieldValue("")
+    }
+
     Column(
         modifier = modifier.padding(16.dp)
     ) {
@@ -113,11 +118,7 @@ fun HomeBody(
                     val input = it.text.replace(" ", "")
 
                     if (input.isEmpty() || (input.length <= 8 && input.last().isDigit())) {
-                        if (input.length >= 6) {
-                            if (!homeViewModel.isSendRequest) {
-                                homeViewModel.searchCard(input)
-                            }
-                        }
+                        homeViewModel.onInputChange(input)
                         val result = formattedBINText(input)
                         cardBIN = TextFieldValue(result.toString(), selection = TextRange(result.length))
                     }
@@ -162,7 +163,10 @@ fun HomeBody(
                 }
                 is HomeUIState.Error -> {
                     val errorMessage = (data as HomeUIState.Error).error
-                    Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                    if (homeViewModel.isRequestDataFromApiError) {
+                        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                        homeViewModel.isRequestDataFromApiError = false
+                    }
                 }
                 is HomeUIState.SuccessCard -> {
                     val card = (data as HomeUIState.SuccessCard).curCard

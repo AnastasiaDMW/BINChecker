@@ -2,7 +2,7 @@
     <string name="app_name">BINChecker</string>
     <string name="home">Поиск по BIN</string>
     <string name="history">История поиска</string>
-    <string name="bin_input">Введите первые 6–8 цифр номера карты</string>
+    <string name="bin_input">Введите первые 6-8 цифр номера карты</string>
     <string name="btn_history">Посмотреть историю поиска</string>
     <string name="scheme">Схема: </string>
     <string name="type">Тип: </string>

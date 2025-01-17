@@ -1,6 +1,5 @@
 package com.example.binchecker.ui.screen.history
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.binchecker.repository.BINDatabaseRepository
@@ -22,18 +21,13 @@ class HistoryViewModel @Inject constructor(
     private val _historyUiState: MutableStateFlow<HistoryUIState> = MutableStateFlow(HistoryUIState.Loading)
     val historyUiState: StateFlow<HistoryUIState> = _historyUiState
 
-    init {
-        getAllCards()
-    }
-
-    private fun getAllCards() {
+    fun getAllCards() {
         viewModelScope.launch {
             try {
                 _historyUiState.value = HistoryUIState.Loading
                 binDBRepository.getAllCards()
                     .flowOn(Dispatchers.IO)
                     .catch { e ->
-                        Log.d("DB_ERROR", e.message.toString())
                         getAllCards()
                     }
                     .collect {

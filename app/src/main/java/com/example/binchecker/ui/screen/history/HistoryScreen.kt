@@ -15,6 +15,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -61,6 +62,10 @@ fun HistoryBody(
 ) {
     val data by historyViewModel.historyUiState.collectAsState()
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        historyViewModel.getAllCards()
+    }
 
     Column(
         modifier = modifier.padding(16.dp)
