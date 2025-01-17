@@ -1,25 +1,26 @@
 package com.example.binchecker.ui.screen.history
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +28,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.binchecker.R
+import com.example.binchecker.data.database.entity.CardInfo
+import com.example.binchecker.data.network.dto.toBankDto
+import com.example.binchecker.data.network.dto.toCardInfoDto
+import com.example.binchecker.data.network.dto.toCountryDto
 import com.example.binchecker.ui.screen.home.BankInfoContent
 import com.example.binchecker.ui.screen.home.CardInfoContent
 import com.example.binchecker.ui.screen.home.CountryInfoContent
@@ -34,13 +39,15 @@ import com.example.binchecker.ui.theme.BINCheckerTheme
 
 @Composable
 fun HistoryScreen(
-    modifier: Modifier = Modifier,
+    historyViewModel: HistoryViewModel,
+    modifier: Modifier = Modifier
 ) {
     BINCheckerTheme {
         Scaffold(
             modifier = modifier
         ) { innerPadding ->
             HistoryBody(
+                historyViewModel = historyViewModel,
                 modifier = modifier.padding(innerPadding)
             )
         }
@@ -48,10 +55,12 @@ fun HistoryScreen(
 }
 
 @Composable
-fun HistoryBody(modifier: Modifier) {
-    var cardBIN by remember { mutableStateOf("") }
-    val interactionSource = remember { MutableInteractionSource() }
-    val list = listOf<String>()
+fun HistoryBody(
+    historyViewModel: HistoryViewModel,
+    modifier: Modifier
+) {
+    val data by historyViewModel.historyUiState.collectAsState()
+    val context = LocalContext.current
 
     Column(
         modifier = modifier.padding(16.dp)
@@ -64,22 +73,45 @@ fun HistoryBody(modifier: Modifier) {
             color = Color.Black
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Column {
-            BINContentCard(R.color.purple_1, mapOf())
-            BINContentCard(R.color.purple_2, mapOf())
+        when (data) {
+            is HistoryUIState.Loading -> {
+                Column (
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is HistoryUIState.Error -> {
+                val errorMessage = (data as HistoryUIState.Error).error
+                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+            }
+            is HistoryUIState.SuccessCards -> {
+                val cards = (data as HistoryUIState.SuccessCards).cards
+                if (cards != emptyList<CardInfo>()) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    LazyColumn {
+                        items(cards) { card ->
+                            BINContentCard(R.color.purple_1, card)
+                        }
+                    }
+                } else {
+                    Column (
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        NoneHistoryCards()
+                    }
+                }
+            }
         }
-//        LazyColumn {
-//            items(list) {
-//                BINContentCard(R.color.purple_1, mapOf())
-//            }
-//        }
     }
 }
 
 @Composable
-fun BINContentCard(color: Int, data: Map<String, String>) {
+fun BINContentCard(color: Int, cardInfo: CardInfo) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp),
         elevation = CardDefaults.cardElevation(
@@ -103,28 +135,44 @@ fun BINContentCard(color: Int, data: Map<String, String>) {
                     fontWeight = FontWeight.Bold
                 )
             }
-//            Spacer(modifier = Modifier.height(12.dp))
-//            CardInfoContent(data)
-//            Spacer(modifier = Modifier.height(8.dp))
-//            CountryInfoContent(data)
-//            Spacer(modifier = Modifier.height(8.dp))
-//            BankInfoContent(data)
+            Spacer(modifier = Modifier.height(12.dp))
+            CardInfoContent(cardInfo.toCardInfoDto())
+            Spacer(modifier = Modifier.height(8.dp))
+            CountryInfoContent(cardInfo.toCountryDto())
+            Spacer(modifier = Modifier.height(8.dp))
+            BankInfoContent(cardInfo.toBankDto())
+        }
+    }
+}
+
+@Composable
+fun NoneHistoryCards() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colorResource(R.color.purple_2)
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.empty_list_history),
+                fontSize = 18.sp
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun BINContentCardPreview() {
+fun NoneHistoryCardPreview() {
     BINCheckerTheme {
-        BINContentCard(R.color.purple_1, mapOf())
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HistoryBodyPreview() {
-    BINCheckerTheme {
-        HistoryBody(Modifier.fillMaxSize())
+        NoneHistoryCards()
     }
 }

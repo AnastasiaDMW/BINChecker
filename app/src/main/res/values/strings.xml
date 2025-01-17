@@ -17,4 +17,5 @@
     <string name="word_code">Буквенный код: </string>
     <string name="country_code">Код страны: </string>
     <string name="error">Ошибка!</string>
+    <string name="empty_list_history">История запросов пуста</string>
 </resources>
