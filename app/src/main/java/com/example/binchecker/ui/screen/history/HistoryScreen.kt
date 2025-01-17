@@ -92,8 +92,9 @@ fun HistoryBody(
                 if (cards != emptyList<CardInfo>()) {
                     Spacer(modifier = Modifier.height(24.dp))
                     LazyColumn {
-                        items(cards) { card ->
-                            BINContentCard(R.color.purple_1, card)
+                        items(cards.indices.toList()) { index ->
+                            val color = if (index % 2 == 0) R.color.purple_1 else R.color.purple_2
+                            BINContentCard(color, cards[index])
                         }
                     }
                 } else {
